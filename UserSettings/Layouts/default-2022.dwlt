@@ -48,7 +48,11 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
+<<<<<<< Updated upstream
   controlID: 119
+=======
+  controlID: 36
+>>>>>>> Stashed changes
   draggingID: 0
 --- !u!114 &3
 MonoBehaviour:
@@ -69,8 +73,13 @@ MonoBehaviour:
     y: 0
     width: 363.19995
     height: 722.8
+<<<<<<< Updated upstream
   m_MinSize: {x: 276, y: 71}
   m_MaxSize: {x: 4001, y: 4021}
+=======
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
+>>>>>>> Stashed changes
   m_ActualView: {fileID: 13}
   m_Panes:
   - {fileID: 13}
@@ -334,14 +343,24 @@ MonoBehaviour:
   m_LastFolders:
   - Assets/Images
   m_LastFoldersGridSize: -1
+<<<<<<< Updated upstream
   m_LastProjectPath: D:\Unity\shooting-game
+=======
+  m_LastProjectPath: C:\Users\99899\Documents\GitHub\shooting-game
+>>>>>>> Stashed changes
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
+<<<<<<< Updated upstream
     m_SelectedIDs: 82610000
     m_LastClickedID: 24962
     m_ExpandedIDs: 000000004c610000ffffff7f
+=======
+    m_SelectedIDs: 04060000
+    m_LastClickedID: 1540
+    m_ExpandedIDs: 000000000406000000ca9a3bffffff7f
+>>>>>>> Stashed changes
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -511,7 +530,11 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 82610000
       m_LastClickedID: 0
+<<<<<<< Updated upstream
       m_ExpandedIDs: 1afbffff
+=======
+      m_ExpandedIDs: 2cd3feff
+>>>>>>> Stashed changes
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
