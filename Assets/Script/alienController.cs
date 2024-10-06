@@ -1,13 +1,4 @@
-﻿/*
-2D Space Shooter
-
-Code by Alberto Betella (alberto@betella.net)
-
-Relased Under a Creative Commons License:
-Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
-http://creativecommons.org/licenses/by-nc-sa/4.0/
-*/
-
+﻿
 
 using UnityEngine;
 using System.Collections;
