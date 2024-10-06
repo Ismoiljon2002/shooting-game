@@ -1,10 +1,11 @@
 fileFormatVersion: 2
 guid: 29531ec0daa9940058966fcec22abc6c
-timeCreated: 1456850642
-licenseType: Free
 MonoImporter:
+  externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - alien: {fileID: 159426, guid: bc72da211169d4513b12ddecc5c185ed, type: 3}
+  - alienBig: {fileID: 159426, guid: c876aa1a185fe2f4a9b181af3e722cff, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

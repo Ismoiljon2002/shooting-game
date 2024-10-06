@@ -1,26 +1,24 @@
-﻿
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
-
 
 public class enemyGenerator : MonoBehaviour {
 
-	public GameObject alien;
+    public GameObject alien;
+    public GameObject alienBig;
 
-	private float timeBetweenEnemies = 2f;  // 0.2 = 5 shots per second
-	private int secondsBeforeFirstEnemyAppears = 1; // Wait X seconds before the first enemy appears after the game starts
+    private float timeBetweenEnemies = 2f;  
+    private int secondsBeforeFirstEnemyAppears = 1; 
 
-	private float timeLastAlien;
+    private float timeLastAlien;
 
+    void FixedUpdate () {
 
-	void FixedUpdate () {
+        if (Time.realtimeSinceStartup > secondsBeforeFirstEnemyAppears && Time.time >= timeLastAlien) {
+            
+            Instantiate(alien, new Vector3(Random.Range(-5f, 5f), 0, 10f), Quaternion.identity);
+            Instantiate(alienBig, new Vector3(Random.Range(-5f, 5f), 0, 15f), Quaternion.identity);
 
-		if (Time.realtimeSinceStartup > secondsBeforeFirstEnemyAppears && Time.time >= timeLastAlien) {
-
-		GameObject.Instantiate(alien);
-		timeLastAlien = Time.time + timeBetweenEnemies;
-
-		}
-	}
+            timeLastAlien = Time.time + timeBetweenEnemies;
+        }
+    }
 }

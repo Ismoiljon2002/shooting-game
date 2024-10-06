@@ -887,6 +887,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alien: {fileID: 159426, guid: bc72da211169d4513b12ddecc5c185ed, type: 3}
+  alienBig: {fileID: 159426, guid: 0e477b900eee0424cac36e3325e3d498, type: 3}
 --- !u!4 &1234918415
 Transform:
   m_ObjectHideFlags: 0
