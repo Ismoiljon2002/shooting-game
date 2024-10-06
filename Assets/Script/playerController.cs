@@ -1,113 +1,146 @@
-﻿/*
-2D Space Shooter
- 
-Code by Alberto Betella (alberto@betella.net)
-
-Relased Under a Creative Commons License:
-Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
-http://creativecommons.org/licenses/by-nc-sa/4.0/
-*/
-
-// SIMPLIFIED VERSION
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
+public class playerController : MonoBehaviour 
+{
+    public GameObject playerBullet;
+    public bool playerIsImmortal = false; // Here you can cheat ;)
+    public int playerLives = 3; // read by GUI script
+    public bool isGameOver = false; // read by GUI script
 
-public class playerController : MonoBehaviour {
+    // Tuning
+    private float pushUpForce = 6.0f; // force applied when fly button is tapped
+    private float playerBulletXOffset = 0.5f;
+    private float playerBulletYOffset = 0f;
+    private float timeBetweenShots = 0.2f;  // 0.2 = 5 shots per second
+    private float timestamp;
 
-	public GameObject playerBullet;
-	public bool playerIsImmortal = false; // Here you can cheat ;)
-	public int playerLives = 3; // read by GUI script
-	public bool isGameOver = false; // read by GUI script
+    private Rigidbody2D rb; // Reference to Rigidbody2D component
 
-	// Tuning
-	private float pushUpForce = 6.0f; // force applied when fly button is tapped
-	private float playerBulletXOffset = 0.5f;
-	private float playerBulletYOffset = 0f;
-	private float timeBetweenShots = 0.2f;  // 0.2 = 5 shots per second
-	private float timestamp;
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0; // Disable gravity for the player
+    }
 
-	void FixedUpdate () {
-
-
-		if (Input.GetButton("Fire1"))
+	void FixedUpdate()
+	{
+		if (Input.GetButton("Up"))
 		{
-			Fire1Pressed ();
-
+			upArrowPressed();
 		}
+		if (Input.GetButton("Down"))
+		{
+			downArrowPressed();
+		}
+		if (Input.GetButton("Right"))
+		{
+			forwardArrowPressed();
+		}
+		if (Input.GetButton("Left"))
+		{
+			backArrowPressed();
+		}
+
 		if (Input.GetButton("Fire2"))
 		{
-			Fire2Pressed ();
+			Fire2Pressed();
 		}
+
+		// Clamp the player's position within the screen boundaries
+		ClampPlayerPosition();
 	}
 
-	void Fire1Pressed () {
-		//Fly up
-		GetComponent<Rigidbody2D>().AddForce(new Vector2(0, pushUpForce));
-
-	}
-
-	void Fire2Pressed () {
-
-		if (Time.time >= timestamp) {
-			// Shoot bullet
-			Instantiate(playerBullet, transform.position+new Vector3 (playerBulletXOffset,playerBulletYOffset,0), Quaternion.identity);
-			timestamp = Time.time + timeBetweenShots;
-		}
-	}
-
-
-	// NB. Player and its bullet go in two dedicated layers where collisions must be disabled (Edit->project settings->physics 2D)
-	// Collision with Trigger is for the bullets and enemies
-	void OnTriggerEnter2D(Collider2D thisObject)
+	void ClampPlayerPosition()
 	{
-		playerDidCollide ();
+		// Get the main camera
+		Camera cam = Camera.main;
+		
+		// Calculate screen boundaries in world coordinates
+		float halfHeight = cam.orthographicSize; // Height of the view is from -halfHeight to halfHeight
+		float halfWidth = cam.orthographicSize * cam.aspect; // Width of the view is from -halfWidth to halfWidth
+
+		// Get current position
+		Vector2 newPosition = transform.position;
+
+		// Clamp the x position within the screen boundaries
+		newPosition.x = Mathf.Clamp(newPosition.x, -halfWidth, halfWidth);
+
+		// Clamp the y position within the screen boundaries
+		newPosition.y = Mathf.Clamp(newPosition.y, -halfHeight, halfHeight);
+
+		// Set the player's position
+		transform.position = newPosition;
 	}
 
-	// Normal Collision (no trigger) is for floor and ceiling, so we have physical constraints
-	void OnCollisionEnter2D(Collision2D thisObject)
-	{
-		playerDidCollide ();
-	}
+    void upArrowPressed() 
+    {
+        // Move up
+        rb.AddForce(new Vector2(0, pushUpForce));
+    }
 
+    void downArrowPressed() 
+    {
+        // Move down
+        rb.AddForce(new Vector2(0, -pushUpForce));
+    }
 
+    void forwardArrowPressed() 
+    {
+        // Move right
+        rb.AddForce(new Vector2(pushUpForce, 0));
+    }
 
-	void playerDidCollide () {
+    void backArrowPressed() 
+    {
+        // Move left
+        rb.AddForce(new Vector2(-pushUpForce, 0));
+    }
 
-		if (playerLives > 0 && !playerIsImmortal) {
-			playerLives=playerLives-1; // lose 1 life
-			//Debug.Log("Collision!"+" "+playerLives+" Lives");
+    void Fire2Pressed() 
+    {
+        if (Time.time >= timestamp) 
+        {
+            // Shoot bullet
+            Instantiate(playerBullet, transform.position + new Vector3(playerBulletXOffset, playerBulletYOffset, 0), Quaternion.identity);
+            timestamp = Time.time + timeBetweenShots;
+        }
+    }
 
-		} else if (playerLives <= 0 && !playerIsImmortal) { // no lives remaining
+    void OnTriggerEnter2D(Collider2D thisObject)
+    {
+        playerDidCollide();
+    }
 
-			gameOver();
+    void OnCollisionEnter2D(Collision2D thisObject)
+    {
+        playerDidCollide();
+    }
 
-		}
+    void playerDidCollide() 
+    {
+        if (playerLives > 0 && !playerIsImmortal) 
+        {
+            playerLives -= 1; // lose 1 life
+        } 
+        else if (playerLives <= 0 && !playerIsImmortal) 
+        {
+            gameOver();
+        }
+    }
 
+    void gameOver() 
+    {
+        isGameOver = true; // This is picked by the Update function in GUI.cs
+        Time.timeScale = 0.0F; // Stop the game
+    }
 
-	}
-
-
-	void gameOver () {
-
-		//Debug.Log("GAME OVER");
-		isGameOver = true; // This is picked by the Update function in GUI.cs
-		Time.timeScale = 0.0F; // Stop the game
-
-	}
-
-	// NB. Update is not affected by Time.timeScale (i.e. it also works during Game Over)
-	void Update () {
-
-		// NB Input.GetMouseButtonDown(0) not only triggers on the left mouse click, but also iOS & Android touch events 
-		if (isGameOver && Input.GetButtonDown("Fire1") || isGameOver && Input.GetMouseButtonDown(0)) {
-			//Debug.Log("GAME RESTART");
-			Time.timeScale = 1.0F; // Restart the time
-			Application.LoadLevel(Application.loadedLevel); // Reload this level
-		}
-
-	}
-
-
+    void Update() 
+    {
+        if (isGameOver && (Input.GetButtonDown("Fire1") || Input.GetMouseButtonDown(0))) 
+        {
+            Time.timeScale = 1.0F; // Restart the time
+            Application.LoadLevel(Application.loadedLevel); // Reload this level
+        }
+    }
 }
