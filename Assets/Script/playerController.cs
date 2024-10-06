@@ -1,146 +1,150 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class playerController : MonoBehaviour 
+public class playerController : MonoBehaviour
 {
     public GameObject playerBullet;
-    public bool playerIsImmortal = false; // Here you can cheat ;)
-    public int playerLives = 3; // read by GUI script
-    public bool isGameOver = false; // read by GUI script
+    public bool playerIsImmortal = false; // Cheat mode
+    public int playerLives = 3; // Player starts with 3 lives
+    public bool isGameOver = false; // Flag to detect game over
 
-    // Tuning
-    private float pushUpForce = 6.0f; // force applied when fly button is tapped
+    // Tuning parameters
+    private float pushUpForce = 6.0f; // Force applied to move the player
     private float playerBulletXOffset = 0.5f;
     private float playerBulletYOffset = 0f;
-    private float timeBetweenShots = 0.2f;  // 0.2 = 5 shots per second
+    private float timeBetweenShots = 0.2f; // Time between shots
     private float timestamp;
 
-    private Rigidbody2D rb; // Reference to Rigidbody2D component
+    private Rigidbody2D rb; // Reference to Rigidbody2D
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 0; // Disable gravity for the player
+        rb.gravityScale = 0; // Disable gravity
     }
 
-	void FixedUpdate()
-	{
-		if (Input.GetButton("Up"))
-		{
-			upArrowPressed();
-		}
-		if (Input.GetButton("Down"))
-		{
-			downArrowPressed();
-		}
-		if (Input.GetButton("Right"))
-		{
-			forwardArrowPressed();
-		}
-		if (Input.GetButton("Left"))
-		{
-			backArrowPressed();
-		}
-
-		if (Input.GetButton("Fire2"))
-		{
-			Fire2Pressed();
-		}
-
-		// Clamp the player's position within the screen boundaries
-		ClampPlayerPosition();
-	}
-
-	void ClampPlayerPosition()
-	{
-		// Get the main camera
-		Camera cam = Camera.main;
-		
-		// Calculate screen boundaries in world coordinates
-		float halfHeight = cam.orthographicSize; // Height of the view is from -halfHeight to halfHeight
-		float halfWidth = cam.orthographicSize * cam.aspect; // Width of the view is from -halfWidth to halfWidth
-
-		// Get current position
-		Vector2 newPosition = transform.position;
-
-		// Clamp the x position within the screen boundaries
-		newPosition.x = Mathf.Clamp(newPosition.x, -halfWidth, halfWidth);
-
-		// Clamp the y position within the screen boundaries
-		newPosition.y = Mathf.Clamp(newPosition.y, -halfHeight, halfHeight);
-
-		// Set the player's position
-		transform.position = newPosition;
-	}
-
-    void upArrowPressed() 
+    void FixedUpdate()
     {
-        // Move up
+        if (Input.GetButton("Up"))
+        {
+            MoveUp();
+        }
+        if (Input.GetButton("Down"))
+        {
+            MoveDown();
+        }
+        if (Input.GetButton("Right"))
+        {
+            MoveRight();
+        }
+        if (Input.GetButton("Left"))
+        {
+            MoveLeft();
+        }
+
+        if (Input.GetButton("Fire2"))
+        {
+            Shoot();
+        }
+
+        // Restrict the player's movement within the screen boundaries
+        ClampPlayerPosition();
+    }
+
+    // Method to restrict player within screen bounds
+    void ClampPlayerPosition()
+    {
+        Camera cam = Camera.main;
+        float halfHeight = cam.orthographicSize;
+        float halfWidth = cam.orthographicSize * cam.aspect;
+
+        Vector2 newPosition = transform.position;
+        newPosition.x = Mathf.Clamp(newPosition.x, -halfWidth, halfWidth);
+        newPosition.y = Mathf.Clamp(newPosition.y, -halfHeight, halfHeight);
+
+        transform.position = newPosition;
+    }
+
+    // Movement controls
+    void MoveUp()
+    {
         rb.AddForce(new Vector2(0, pushUpForce));
     }
 
-    void downArrowPressed() 
+    void MoveDown()
     {
-        // Move down
         rb.AddForce(new Vector2(0, -pushUpForce));
     }
 
-    void forwardArrowPressed() 
+    void MoveRight()
     {
-        // Move right
         rb.AddForce(new Vector2(pushUpForce, 0));
     }
 
-    void backArrowPressed() 
+    void MoveLeft()
     {
-        // Move left
         rb.AddForce(new Vector2(-pushUpForce, 0));
     }
 
-    void Fire2Pressed() 
+    // Shooting logic
+    void Shoot()
     {
-        if (Time.time >= timestamp) 
+        if (Time.time >= timestamp)
         {
-            // Shoot bullet
+            // Fire the bullet
             Instantiate(playerBullet, transform.position + new Vector3(playerBulletXOffset, playerBulletYOffset, 0), Quaternion.identity);
             timestamp = Time.time + timeBetweenShots;
         }
     }
 
-    void OnTriggerEnter2D(Collider2D thisObject)
+    // Detecting collisions with obstacles
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        playerDidCollide();
+        HandleCollision(collision.gameObject);
     }
 
-    void OnCollisionEnter2D(Collision2D thisObject)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        playerDidCollide();
+        HandleCollision(collision.gameObject);
     }
 
-    void playerDidCollide() 
+    // Handle player collision
+    void HandleCollision(GameObject collidedObject)
     {
-        if (playerLives > 0 && !playerIsImmortal) 
+        if (collidedObject.CompareTag("Obstacle"))
         {
-            playerLives -= 1; // lose 1 life
-        } 
-        else if (playerLives <= 0 && !playerIsImmortal) 
-        {
-            gameOver();
+            if (!playerIsImmortal) // If the player isn't immortal
+            {
+                playerLives--; // Lose one life
+
+                if (playerLives <= 0)
+                {
+                    gameOver(); // Trigger game over when lives reach 0
+                }
+                else
+                {
+                    Debug.Log("Player hit an obstacle! Remaining lives: " + playerLives);
+                }
+            }
         }
     }
 
-    void gameOver() 
+    // Handle game over logic
+    void gameOver()
     {
-        isGameOver = true; // This is picked by the Update function in GUI.cs
+        isGameOver = true; // Set game over flag
         Time.timeScale = 0.0F; // Stop the game
+        Debug.Log("Game Over!");
     }
 
-    void Update() 
+    // Restart the game when it’s over
+    void Update()
     {
-        if (isGameOver && (Input.GetButtonDown("Fire1") || Input.GetMouseButtonDown(0))) 
+        if (isGameOver && (Input.GetButtonDown("Fire1") || Input.GetMouseButtonDown(0)))
         {
-            Time.timeScale = 1.0F; // Restart the time
-            Application.LoadLevel(Application.loadedLevel); // Reload this level
+            // Reset game time and reload the level
+            Time.timeScale = 1.0F;
+            Application.LoadLevel(Application.loadedLevel);
         }
     }
 }
